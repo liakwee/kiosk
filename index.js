@@ -1,5 +1,6 @@
 'use strict';
 const app = require('app');
+var ipc = require('ipc');
 const BrowserWindow = require('browser-window');
 
 
@@ -10,43 +11,43 @@ require('crash-reporter').start();
 require('electron-debug')();
 
 function createMainWindow () {
-	const win = new BrowserWindow({
-		width: 600,
-		height: 400,
-		resizable: false
-	});
+  const win = new BrowserWindow({
+    width: 600,
+    height: 400,
+    resizable: false
+  });
 
-	win.loadUrl('http://paulrhayes.com/experiments/cube-3d/touch.html');
-	win.on('closed', onClosed);
+  win.loadUrl('http://paulrhayes.com/experiments/cube-3d/touch.html');
+  win.on('closed', onClosed);
 
-	return win;
+  return win;
 }
 
 function onClosed() {
-	// deref the window
-	// for multiple windows store them in an array
-	mainWindow = null;
+  // deref the window
+  // for multiple windows store them in an array
+  mainWindow = null;
 }
 
 // prevent window being GC'd
 let mainWindow;
 
 app.on('window-all-closed', function () {
-	if (process.platform !== 'darwin') {
-		app.quit();
-	}
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 
 });
 
 app.on('activate-with-no-open-windows', function () {
-	if (!mainWindow) {
-		mainWindow = createMainWindow();
-	}
+  if (!mainWindow) {
+    mainWindow = createMainWindow();
+  }
 });
 
 app.on('ready', function () {
 
-		var Screen = require('screen');
+    var Screen = require('screen');
 
     var size = Screen.getPrimaryDisplay().size;
 
@@ -59,15 +60,20 @@ app.on('ready', function () {
       'height': height,
       'max-width': width,
       'max-height': height,
-      'fullscreen': true,
-      'frame': false,
-      'kiosk': true,
+      //'fullscreen': true,
+      // 'frame': false,
+      // 'kiosk': true,
       'transparent': true,
       'show': true,
       'resizable': false
     });
     mainWindow.loadUrl('http://paulrhayes.com/experiments/cube-3d/touch.html');
-		mainWindow.on('closed', onClosed);
+    mainWindow.on('closed', onClosed);
 
     // mainWindow = createMainWindow();
 });
+
+ipc.on('online-status-changed', function(event, status) {
+  console.log(status);
+});
+
